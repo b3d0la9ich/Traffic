@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Прогноз</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/predict.css') }}">
+    <script defer src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
+</head>
+<body>
+    <div class="theme-toggle">
+        <button id="toggle-theme">🌙</button>
+    </div>
+
+    <div class="container">
+        <h1>📈 Прогноз пассажиропотока</h1>
+
+        <form method="POST" class="form-block">
+            <label>Год:</label>
+            <input type="number" name="year" min="2016" max="2030" required value="{{ request.form.year if request.form.year }}">
+
+            <label>Месяц:</label>
+            <input type="number" name="month" min="1" max="12" required value="{{ request.form.month if request.form.month }}">
+
+            <button type="submit">Построить прогноз</button>
+        </form>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            <div class="messages">
+              {% for category, message in messages %}
+                <div class="alert {{ category }}">{{ message }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        {% if prediction %}
+        <div class="result">
+            <h2>🔮 Прогноз на {{ request.form.year }}-{{ "%02d"|format(request.form.month | int) }}:
+                <strong>{{ prediction | round }} пассажиров</strong></h2>
+        </div>
+        {% endif %}
+
+        {% if plot_url %}
+        <div class="plot-block">
+            <img src="data:image/png;base64,{{ plot_url }}" alt="График прогноза">
+        </div>
+        {% endif %}
+
+        <a href="{{ url_for('dashboard') }}">← Назад в кабинет</a>
+    </div>
+</body>
+</html>

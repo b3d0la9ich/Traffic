@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Изменить данные</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_data.css') }}">
+    <script defer src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
+</head>
+<body>
+    <div class="theme-toggle">
+        <button id="toggle-theme">🌙</button>
+    </div>
+
+    <div class="form-card">
+        <h2>Изменение данных о пассажиропотоке</h2>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="message {{ category }}">
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST">
+            <label>Год:</label>
+            <input type="number" name="year" min="2016" max="2030" required>
+
+            <label>Месяц:</label>
+            <input type="number" name="month" min="1" max="12" required>
+
+            <label>Новое количество пассажиров:</label>
+            <input type="number" name="passengers" min="0" required>
+
+            <button type="submit">Изменить</button>
+        </form>
+
+        <a class="back-link" href="{{ url_for('dashboard') }}">← Назад</a>
+    </div>
+</body>
+</html>
