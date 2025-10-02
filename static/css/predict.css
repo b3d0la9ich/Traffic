@@ -162,3 +162,39 @@ a:hover {
         transform: translateY(0);
     }
 }
+
+/* === флеши прогноза (pred_*) === */
+.messages { margin: 12px 0; }
+.alert { padding: 10px 12px; border-radius: 8px; margin-bottom: 8px; font-size: 14px; }
+.alert.pred_success { background: #d1e7dd; color: #0f5132; }
+.alert.pred_warning { background: #fff3cd; color: #664d03; }
+.alert.pred_danger  { background: #f8d7da; color: #842029; }
+
+/* контейнер */
+.container {
+  max-width: 900px;
+  margin: 32px auto;
+  padding: 0 16px;
+}
+.form-block {
+  display: grid; gap: 10px;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: end;
+}
+.form-block label { font-size: 14px; }
+.form-block input {
+  padding: 10px 12px;
+  border: 1px solid #dcdcdc;
+  border-radius: 10px;
+}
+.form-block button {
+  padding: 10px 14px; border: 0; border-radius: 10px; background: #0d6efd; color: #fff; cursor: pointer;
+}
+.result { margin: 16px 0; }
+.plot-block { margin-top: 12px; }
+.plot-block img { max-width: 100%; height: auto; }
+
+/* адаптив */
+@media (max-width: 720px) {
+  .form-block { grid-template-columns: 1fr; }
+}

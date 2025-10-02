@@ -138,3 +138,6 @@ body.dark .welcome-container {
         transform: translateY(0);
     }
 }
+
+/* универсальные базовые стили */
+.flash, .alert { padding: 10px 12px; border-radius: 8px; margin: 8px 0; font-size: 14px; }
