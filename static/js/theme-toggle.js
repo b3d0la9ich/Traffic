@@ -1,16 +1,26 @@
-document.addEventListener("DOMContentLoaded", () => {
-    const toggleBtn = document.getElementById("toggle-theme");
-    const isDark = localStorage.getItem("theme") === "dark";
+(function () {
+  const KEY = 'theme';
+  const root = document.documentElement; // <html>
+  const btn = document.getElementById('toggle-theme');
 
-    if (isDark) {
-        document.body.classList.add("dark");
-        toggleBtn.textContent = "☀️";
-    }
+  function applyTheme(theme) {
+    root.setAttribute('data-theme', theme);
+    localStorage.setItem(KEY, theme);
+    if (btn) btn.textContent = theme === 'dark' ? '🌞' : '🌙';
+  }
 
-    toggleBtn.addEventListener("click", () => {
-        document.body.classList.toggle("dark");
-        const darkMode = document.body.classList.contains("dark");
-        toggleBtn.textContent = darkMode ? "☀️" : "🌙";
-        localStorage.setItem("theme", darkMode ? "dark" : "light");
+  const stored = localStorage.getItem(KEY);
+  const initial =
+    stored || (window.matchMedia &&
+               window.matchMedia('(prefers-color-scheme: dark)').matches
+               ? 'dark' : 'light');
+
+  applyTheme(initial);
+
+  if (btn) {
+    btn.addEventListener('click', () => {
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      applyTheme(next);
     });
-});
+  }
+})();

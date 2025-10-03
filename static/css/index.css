@@ -1,3 +1,22 @@
+/* === Тема: переменные и фон, как на странице прогноза === */
+:root { --card-bg: #ffffff; }
+
+html[data-theme="dark"] {
+  --card-bg: #151718;
+}
+
+html, body { height: 100%; }
+
+body {
+  background: #eef9fb;           /* светлая по умолчанию */
+  color: #0b2e2f;
+}
+
+html[data-theme="dark"] body {
+  background: #0e0f10 !important; /* как в прогнозе */
+  color: #e7ecef !important;
+}
+
 :root {
     --bg-color: #e0f7fa;
     --text-color: #004d40;

@@ -1,61 +1,75 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <title>Изменить данные</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_data.css') }}">
-    <script defer src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
-    <script>
-      function syncMonthMax() {
-        const y = document.getElementById('year');
-        const m = document.getElementById('month');
-        if (!y || !m) return;
-        if (y.value === '2025') {
-          m.max = 9;
-          if (parseInt(m.value || '0', 10) > 9) m.value = 9;
-        } else {
-          m.max = 12;
-        }
+  <meta charset="UTF-8">
+  <title>Изменить данные</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_data.css') }}">
+  <script defer src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
+  <script>
+    function syncMonthMax() {
+      const y = document.getElementById('year');
+      const m = document.getElementById('month');
+      if (!y || !m) return;
+      if (y.value === '2025') {
+        m.max = 9;
+        if (parseInt(m.value || '0', 10) > 9) m.value = 9;
+      } else {
+        m.max = 12;
       }
-      document.addEventListener('DOMContentLoaded', syncMonthMax);
-    </script>
+    }
+    document.addEventListener('DOMContentLoaded', syncMonthMax);
+  </script>
 </head>
 <body>
-    <div class="theme-toggle">
-        <button id="toggle-theme">🌙</button>
-    </div>
+  <div class="theme-toggle">
+    <button id="toggle-theme">🌙</button>
+  </div>
 
-    <div class="form-card">
-        <h2>Изменение данных о пассажиропотоке</h2>
+  <div class="form-card">
+    <h2>Изменение данных о пассажиропотоке</h2>
 
-        {% with messages = get_flashed_messages(with_categories=true, category_filter=['edit_success','edit_warning','edit_danger']) %}
-          {% if messages %}
-            <div class="flash-messages">
-              {% for category, message in messages %}
-                <div class="flash {{ category }}">{{ message }}</div>
-              {% endfor %}
-            </div>
-          {% endif %}
-        {% endwith %}
+    {% with messages = get_flashed_messages(with_categories=true, category_filter=['edit_success','edit_warning','edit_danger']) %}
+      {% if messages %}
+        <div class="flash-messages">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
 
-        <form method="POST">
-            <label for="year">Год:</label>
-            <input id="year" type="number" name="year" min="2016" max="2025" required
-                   value="{{ request.form.get('year','') }}"
-                   oninput="syncMonthMax()">
+    <form method="POST" autocomplete="off">
+      <label for="year">Год:</label>
+      <input id="year"
+             type="number"
+             name="year"
+             min="2016"
+             max="2025"
+             required
+             value="{{ request.form.get('year','') }}"
+             oninput="syncMonthMax()">
 
-            <label for="month">Месяц:</label>
-            <input id="month" type="number" name="month" min="1" max="12" required
-                   value="{{ request.form.get('month','') }}">
+      <label for="month">Месяц:</label>
+      <input id="month"
+             type="number"
+             name="month"
+             min="1"
+             max="12"
+             required
+             value="{{ request.form.get('month','') }}">
 
-            <label for="passengers">Новое количество пассажиров:</label>
-            <input id="passengers" type="number" name="passengers" min="0" required
-                   value="{{ request.form.get('passengers','') }}">
+      <label for="passengers">Новое количество пассажиров:</label>
+      <input id="passengers"
+             type="number"
+             name="passengers"
+             min="0"
+             required
+             value="{{ request.form.get('passengers','') }}">
 
-            <button type="submit">Изменить</button>
-        </form>
+      <button type="submit">Изменить</button>
+    </form>
 
-        <a class="back-link" href="{{ url_for('dashboard') }}">← Назад</a>
-    </div>
+    <a class="back-link" href="{{ url_for('dashboard') }}">← Назад</a>
+  </div>
 </body>
 </html>

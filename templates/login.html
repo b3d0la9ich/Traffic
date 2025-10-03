@@ -38,7 +38,7 @@
           {% endif %}
         {% endwith %}
 
-        <form method="POST" onsubmit="validateForm(event)">
+        <form method="POST" onsubmit="validateForm(event)" autocomplete="on">
             <label for="username">Имя пользователя:</label>
             <input type="text"
                    id="username"
@@ -46,6 +46,8 @@
                    required
                    minlength="3"
                    pattern="\S+"
+                   autocomplete="username"
+                   spellcheck="false"
                    title="Логин без пробелов, минимум 3 символа"
                    value="{{ request.form.get('username','') }}">
 
@@ -56,6 +58,7 @@
                    required
                    minlength="8"
                    pattern="\S+"
+                   autocomplete="current-password"
                    title="Пароль без пробелов, минимум 8 символов">
 
             <button type="submit">Войти</button>
