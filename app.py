@@ -216,10 +216,10 @@ def predict():
             month = int(request.form['month'].strip())
 
             if not (2016 <= year <= 2030) or not (1 <= month <= 12):
-                flash("Введите год 2016–2030 и месяц 1–12.", "pred_danger")
+                flash("Введите год от 2016 до 2030 и месяц от 1 до 12!", "danger")
                 return redirect(url_for("predict"))
 
-            # Данные
+            # Получение данных
             data = PassengerData.query.all()
             incidents = Incident.query.all()
 
@@ -227,33 +227,87 @@ def predict():
             df = pd.DataFrame(rows)
             df['date'] = pd.to_datetime(df[['year', 'month']].assign(day=1))
 
-            # Признаки сезонности
+            # Обработка инцидентов с учётом продолжительности и постепенного восстановления
+            incident_effects = pd.Series(1.0, index=pd.date_range(start='2026-01-01', end='2030-12-01', freq='MS'))
+
+            for inc in incidents:
+                start = pd.to_datetime(f"{inc.year}-{inc.month:02d}-01", format="%Y-%m-%d")
+                for i in range(inc.duration):
+                    month_inc = start + pd.DateOffset(months=i)
+                    if month_inc in incident_effects.index:
+                        decay = 1 + inc.impact * (1 - i / inc.duration)
+                        incident_effects[month_inc] *= decay
+
+            # Добавляем признаки
             df['sin_month'] = np.sin(2 * np.pi * df['month'] / 12)
             df['cos_month'] = np.cos(2 * np.pi * df['month'] / 12)
 
-            # Обучение
+            # Предсказываемая дата
+            pred_date = pd.to_datetime(f"{year}-{month:02d}-01", format="%Y-%m-%d")
+
             X = df[['year', 'sin_month', 'cos_month']]
             y = df['passengers']
-            model = LinearRegression().fit(X, y)
 
-            # Точка прогноза
-            pred_date = pd.to_datetime(f"{year}-{month:02d}-01", format="%Y-%m-%d")
-            prediction = float(model.predict([[year,
-                                               np.sin(2 * np.pi * month / 12),
-                                               np.cos(2 * np.pi * month / 12)]])[0])
+            model = LinearRegression()
+            model.fit(X, y)
 
-            # Сохраним прогноз
-            db.session.add(Prediction(year=year, month=month, predicted_passengers=int(prediction)))
+            start_date = pred_date - pd.DateOffset(years=2)
+            full_range = pd.date_range(start=start_date, end=pred_date, freq='MS')
+
+            df_full = pd.DataFrame({'date': full_range})
+            df_full['year'] = df_full['date'].dt.year
+            df_full['month'] = df_full['date'].dt.month
+            df_full['sin_month'] = np.sin(2 * np.pi * df_full['month'] / 12)
+            df_full['cos_month'] = np.cos(2 * np.pi * df_full['month'] / 12)
+
+            df_full = pd.merge(df_full, df[['date', 'passengers']], on='date', how='left')
+
+            missing = df_full['passengers'].isna()
+            if missing.any():
+                X_missing = df_full.loc[missing, ['year', 'sin_month', 'cos_month']]
+                predicted = model.predict(X_missing)
+                df_full.loc[missing, 'passengers'] = predicted
+
+            # Применяем влияние инцидентов
+            df_full['adjusted'] = df_full['passengers']
+            for date in df_full['date']:
+                if date in incident_effects.index:
+                    df_full.loc[df_full['date'] == date, 'adjusted'] *= incident_effects[date]
+
+            prediction = df_full.loc[df_full['date'] == pred_date, 'adjusted'].values[0]
+            pred = Prediction(year=year, month=month, predicted_passengers=int(prediction))
+            db.session.add(pred)
             db.session.commit()
 
-            # График
+            # Построение графика
             plt.figure(figsize=(10, 4))
-            plt.plot(df['date'], df['passengers'], marker='o', label='Факт')
-            plt.scatter([pred_date], [prediction], color='red', label='Прогноз', zorder=5)
+            is_real = df_full['date'].isin(df['date'])
+            is_pred = ~is_real
+
+            # График фактических данных
+            plt.plot(df_full.loc[is_real, 'date'], df_full.loc[is_real, 'adjusted'],
+                     marker='o', label='Факт')
+
+            # График прогнозных данных
+            plt.plot(df_full.loc[is_pred, 'date'], df_full.loc[is_pred, 'adjusted'],
+                     marker='o', linestyle='dashed', color='blue', label='Прогноз')
+
+            # Прогнозируемая точка
+            plt.scatter([pred_date], [prediction], color='red', label=f'Прогноз ({prediction:.0f})', zorder=5)
+            plt.annotate(f'{prediction:.0f}', xy=(pred_date, prediction), xytext=(5, 5),
+                         textcoords='offset points', color='red')
+
+            # Убедимся, что ось X отображает все даты правильно
+            plt.xticks(df_full['date'], df_full['date'].dt.strftime('%Y-%m'), rotation=45)
+
+            # Подписи и оформление
+            plt.title('Пассажиропоток с прогнозом')
+            plt.ylabel('Количество пассажиров')
+            plt.grid(True)
             plt.legend()
-            plt.title('Пассажиропоток с точкой прогноза')
             plt.tight_layout()
 
+            # Сохраняем и отображаем график
             img = io.BytesIO()
             plt.savefig(img, format='png')
             img.seek(0)
@@ -261,10 +315,11 @@ def predict():
             plt.close()
 
         except Exception as e:
-            flash(f"Ошибка при обработке прогноза: {e}", "pred_danger")
+            flash(f"Ошибка при обработке прогноза: {str(e)}", "danger")
             return redirect(url_for("predict"))
 
     return render_template('predict.html', prediction=prediction, plot_url=plot_url)
+
 
 
 # Инциденты
