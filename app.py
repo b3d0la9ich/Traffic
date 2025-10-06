@@ -197,7 +197,11 @@ def edit_data():
             flash("Проверьте корректность введённых значений.", "edit_danger")
             return redirect(url_for('edit_data'))
 
-    return render_template('edit_data.html')
+    # --- GET: подготовим данные для предпросмотра и таблицы ---
+    records = PassengerData.query.order_by(PassengerData.year, PassengerData.month).all()
+    data_map = {f"{r.year}-{r.month:02d}": r.passengers for r in records}
+    return render_template('edit_data.html', records=records, data_map=data_map)
+
 
 
 # Прогноз

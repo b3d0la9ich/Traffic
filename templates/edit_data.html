@@ -6,18 +6,47 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_data.css') }}">
   <script defer src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
   <script>
+    // Функция для синхронизации максимального месяца
     function syncMonthMax() {
       const y = document.getElementById('year');
       const m = document.getElementById('month');
       if (!y || !m) return;
       if (y.value === '2025') {
-        m.max = 9;
-        if (parseInt(m.value || '0', 10) > 9) m.value = 9;
+        m.max = 12;  // Разрешаем месяц до декабря 2025
+        if (parseInt(m.value || '0', 10) > 12) m.value = 12;
       } else {
-        m.max = 12;
+        m.max = 12;  // Для других годов максимальный месяц - декабрь
       }
     }
+
+    // Вызовем syncMonthMax при изменении значений
     document.addEventListener('DOMContentLoaded', syncMonthMax);
+
+    // Функция для обновления предпросмотра
+    function updatePreview() {
+      const y = document.getElementById('year').value;
+      const m = document.getElementById('month').value;
+      const dateEl = document.getElementById('preview-date');
+      const valEl = document.getElementById('preview-value');
+
+      // Если год или месяц не выбраны
+      if (!y || !m) {
+        dateEl.textContent = '-';
+        valEl.textContent = 'нет данных';
+        return;
+      }
+
+      // Формируем ключ для поиска
+      const key = `${y}-${String(m).padStart(2, '0')}`;
+      dateEl.textContent = key;
+
+      // Получаем значение для текущего ключа
+      const v = DATA_MAP[key];
+      valEl.textContent = (v !== undefined) ? v : 'нет данных';
+    }
+
+    // Запуск функции обновления предпросмотра после загрузки страницы
+    document.addEventListener('DOMContentLoaded', updatePreview);
   </script>
 </head>
 <body>
@@ -38,38 +67,44 @@
       {% endif %}
     {% endwith %}
 
-    <form method="POST" autocomplete="off">
-      <label for="year">Год:</label>
-      <input id="year"
-             type="number"
-             name="year"
-             min="2016"
-             max="2025"
-             required
-             value="{{ request.form.get('year','') }}"
-             oninput="syncMonthMax()">
+    <!-- Форма и предпросмотр текущего значения -->
+    <div class="edit-grid">
+      <form method="POST" class="edit-form" autocomplete="off">
+        <label for="year">Год</label>
+        <input id="year" type="number" name="year" min="2016" max="2025" required
+               value="{{ request.form.get('year','') }}" oninput="syncMonthMax();updatePreview();">
 
-      <label for="month">Месяц:</label>
-      <input id="month"
-             type="number"
-             name="month"
-             min="1"
-             max="12"
-             required
-             value="{{ request.form.get('month','') }}">
+        <label for="month">Месяц</label>
+        <input id="month" type="number" name="month" min="1" max="12" required
+               value="{{ request.form.get('month','') }}" oninput="updatePreview();">
 
-      <label for="passengers">Новое количество пассажиров:</label>
-      <input id="passengers"
-             type="number"
-             name="passengers"
-             min="0"
-             required
-             value="{{ request.form.get('passengers','') }}">
+        <label for="passengers">Новое количество пассажиров</label>
+        <input id="passengers" type="number" name="passengers" min="0" required
+               value="{{ request.form.get('passengers','') }}">
 
-      <button type="submit">Изменить</button>
-    </form>
+        <button type="submit">Изменить</button>
+      </form>
+
+      <!-- Блок предпросмотра текущего значения -->
+      <aside class="preview">
+        <div class="preview-title">Текущее значение</div>
+        <div class="preview-line">
+          <span id="preview-date">—</span>
+          <span class="preview-sep">→</span>
+          <span id="preview-value" class="preview-value">нет данных</span>
+        </div>
+        <small class="muted">Подсказка: изменяйте год/месяц слева — здесь будет показано,
+          что именно вы собираетесь заменить.</small>
+      </aside>
+    </div>
+
 
     <a class="back-link" href="{{ url_for('dashboard') }}">← Назад</a>
   </div>
+
+  <!-- Передаем объект данных для мгновенного предпросмотра -->
+  <script>
+    const DATA_MAP = JSON.parse('{{ data_map|tojson|safe }}');
+  </script>
 </body>
 </html>

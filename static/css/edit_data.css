@@ -148,3 +148,65 @@ input[type=number] { -moz-appearance: textfield; }
 [data-theme="dark"] .container {
   box-shadow: 0 10px 30px rgba(0, 0, 0, .45);
 }
+
+
+/* сетка: форма + предпросмотр */
+.edit-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.edit-form label { display:block; margin: 8px 0 6px; }
+.preview {
+  background: rgba(0,0,0,0.03);
+  border: 1px solid #e9eef2;
+  border-radius: 12px;
+  padding: 12px;
+}
+html[data-theme="dark"] .preview {
+  background: rgba(255,255,255,0.04);
+  border-color: #30373a;
+}
+.preview-title { font-weight: 700; margin-bottom: 6px; }
+.preview-line {
+  display: flex; align-items: baseline; gap: 8px;
+  font-size: 16px; margin-bottom: 6px;
+}
+.preview-sep { opacity: .6; }
+.preview-value { font-weight: 700; }
+.muted { color: #6c757d; }
+html[data-theme="dark"] .muted { color: #a9b4b9; }
+
+/* таблица данных */
+.table-title { margin: 14px 0 8px; }
+.scroll-x { overflow-x: auto; }
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #e9eef2;
+  background: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.data-table th, .data-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #eef2f5;
+  text-align: right;
+  white-space: nowrap;
+}
+.data-table thead th {
+  position: sticky; top: 0;
+  background: rgba(0,0,0,0.03);
+  text-align: center;
+}
+.year-cell { text-align: center; font-weight: 700; }
+html[data-theme="dark"] .data-table { border-color: #30373a; }
+html[data-theme="dark"] .data-table th,
+html[data-theme="dark"] .data-table td { border-bottom-color: #2a2f33; }
+html[data-theme="dark"] .data-table thead th { background: rgba(255,255,255,0.05); }
+
+/* адаптив */
+@media (max-width: 720px) {
+  .edit-grid { grid-template-columns: 1fr; }
+}
