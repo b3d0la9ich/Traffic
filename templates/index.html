@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Прогноз пассажиропотока</title>
+  <title>Прогноз пассажиропотока Новосибирска</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
   <script defer src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
 </head>
@@ -17,8 +17,8 @@
 
     <header class="topbar">
       <div class="logo">
-        <span class="logo-mark">TI</span>
-        <span class="logo-text">Traffic Insight</span>
+        <span class="logo-mark">54</span>
+        <span class="logo-text">54TrafficInsight</span>
       </div>
       <div class="top-actions">
         <!-- Вход только для админов -->
@@ -28,14 +28,14 @@
 
     <main class="hero">
       <section class="hero-left">
-        <p class="eyebrow">Пассажирские перевозки • Аналитика • ИБ</p>
+        <p class="eyebrow">Пассажирские перевозки Новосибирска • Аналитика • ИБ</p>
         <h1>
           Прогнозирование пассажиропотока
           <span class="hero-highlight">на основе полученных данных</span>
         </h1>
         <p class="hero-subtitle">
           Система позволяет смотреть статистику по годам и строить прогноз
-          пассажиропотока с учётом влияния инцидентов на железной дороге.
+          пассажиропотока Новосибирска с учётом влияния инцидентов на железной дороге.
         </p>
 
         <div class="hero-actions">
@@ -94,17 +94,17 @@
               </div>
               <div class="mini-row">
                 <span>Март</span>
-                <span>184 200</span>
+                <span>184</span>
                 <span class="badge badge-ok">Норма</span>
               </div>
               <div class="mini-row">
                 <span>Апрель</span>
-                <span>192 850</span>
+                <span>192</span>
                 <span class="badge badge-alert">Инцидент</span>
               </div>
               <div class="mini-row">
                 <span>Май</span>
-                <span>201 430</span>
+                <span>201</span>
                 <span class="badge badge-ok">Норма</span>
               </div>
             </div>
@@ -145,7 +145,7 @@
     </section>
 
     <footer class="footer">
-      <span>© {{ current_year or 2025 }} Traffic Insight</span>
+      <span>© {{ current_year or 2025 }} 54TrafficInsight</span>
       <span>Система анализа пассажиропотока железнодорожных перевозок</span>
     </footer>
   </div>
