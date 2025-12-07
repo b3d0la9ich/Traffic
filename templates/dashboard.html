@@ -11,17 +11,110 @@
     <button id="toggle-theme">🌙</button>
 </div>
 
-<div class="dashboard-card">
-    <h2>Здравствуйте, {{ username }}{% if is_admin %}, администратор{% endif %}!</h2>
+<div class="dashboard-page">
+    <div class="bg-orbit bg-orbit-1"></div>
+    <div class="bg-orbit bg-orbit-2"></div>
 
-    <ul>
-        {% if is_admin %}
-            <li><a href="{{ url_for('edit_data') }}">📝 Изменить данные пассажиропотока</a></li>
-            <li><a href="{{ url_for('incidents') }}">🚨 Инциденты на железной дороге</a></li>
-        {% endif %}
-        <li><a href="{{ url_for('predict') }}">📊 Сделать прогноз пассажиропотока</a></li>
-        <li><a href="{{ url_for('logout') }}">🚪 Выйти</a></li>
-    </ul>
+    <header class="dashboard-topbar">
+        <div class="top-brand">
+            <div class="brand-mark">TI</div>
+            <div class="brand-text">
+                <span class="brand-label">Traffic Insight</span>
+                <span class="brand-sub">Личный кабинет</span>
+            </div>
+        </div>
+
+        <div class="user-pill">
+            <span class="user-name">{{ username }}</span>
+            {% if is_admin %}
+                <span class="user-role user-role-admin">Администратор</span>
+            {% else %}
+                <span class="user-role">Пользователь</span>
+            {% endif %}
+        </div>
+    </header>
+
+    <main class="dashboard-layout">
+        <section class="dashboard-main-card">
+            <div class="dash-header">
+                <p class="eyebrow">Навигация по системе</p>
+                <h1>Здравствуйте, {{ username }}{% if is_admin %}, администратор{% endif %}!</h1>
+                <p class="subtitle">
+                    Выберите действие: просмотр статистики и прогноза пассажиропотока или,
+                    при наличии прав администратора, управление данными и инцидентами.
+                </p>
+            </div>
+
+            <div class="tile-grid">
+                {% if is_admin %}
+                    <a href="{{ url_for('edit_data') }}" class="tile tile-admin">
+                        <div class="tile-icon">📝</div>
+                        <div class="tile-body">
+                            <h2>Изменение данных</h2>
+                            <p>Корректировка записей пассажиропотока по годам и месяцам.</p>
+                        </div>
+                    </a>
+
+                    <a href="{{ url_for('incidents') }}" class="tile tile-admin">
+                        <div class="tile-icon">🚨</div>
+                        <div class="tile-body">
+                            <h2>Инциденты</h2>
+                            <p>Управление событиями на железной дороге и их влиянием на поток.</p>
+                        </div>
+                    </a>
+                {% endif %}
+
+                <a href="{{ url_for('statistics') }}" class="tile">
+                    <div class="tile-icon">📊</div>
+                    <div class="tile-body">
+                        <h2>Статистика</h2>
+                        <p>Просмотр распределения пассажиропотока по месяцам и инцидентам.</p>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('predict') }}" class="tile">
+                    <div class="tile-icon">📈</div>
+                    <div class="tile-body">
+                        <h2>Прогноз</h2>
+                        <p>Построение прогноза пассажиропотока на выбранный период.</p>
+                    </div>
+                </a>
+
+                <a href="{{ url_for('logout') }}" class="tile tile-logout">
+                    <div class="tile-icon">🚪</div>
+                    <div class="tile-body">
+                        <h2>Выйти</h2>
+                        <p>Завершить сессию и вернуться к главной странице.</p>
+                    </div>
+                </a>
+            </div>
+        </section>
+
+        <aside class="dashboard-side-card">
+            <div class="side-glow"></div>
+            <h2>Роли и доступ</h2>
+            <p class="side-desc">
+                Система разделяет действия обычных пользователей и администраторов.
+            </p>
+
+            <div class="side-block">
+                <h3>Пользователь</h3>
+                <ul>
+                    <li>Просмотр статистики пассажиропотока.</li>
+                    <li>Получение прогноза на выбранный период.</li>
+                </ul>
+            </div>
+
+            <div class="side-block">
+                <h3>Администратор</h3>
+                <ul>
+                    <li>Редактирование данных пассажиропотока.</li>
+                    <li>Добавление и анализ инцидентов.</li>
+                    <li>Подготовка отчётов по устойчивости перевозок.</li>
+                </ul>
+            </div>
+        </aside>
+    </main>
 </div>
 </body>
 </html>

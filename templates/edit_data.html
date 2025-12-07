@@ -2,24 +2,28 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Изменить данные</title>
+  <title>Изменение данных</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/edit_data.css') }}">
   <script defer src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
 
   <script>
+    // Максимальный год фактических данных приходит с сервера
+    const MAX_REAL_YEAR = parseInt('{{ max_real_year }}', 10);
+
     function syncMonthMax() {
       const y = document.getElementById('year');
       const m = document.getElementById('month');
       if (!y || !m) return;
-      if (y.value === '2025') {
-        m.max = 12;
-        if (parseInt(m.value || '0', 10) > 12) m.value = 12;
-      } else {
-        m.max = 12;
-      }
-    }
 
-    document.addEventListener('DOMContentLoaded', syncMonthMax);
+      const yearVal = parseInt(y.value || '0', 10);
+
+      // Не даём ввести год больше фактического диапазона
+      if (yearVal > MAX_REAL_YEAR) {
+        y.value = MAX_REAL_YEAR;
+      }
+
+      m.max = 12;
+    }
 
     function updatePreview() {
       const y = document.getElementById('year').value;
@@ -28,7 +32,7 @@
       const valEl = document.getElementById('preview-value');
 
       if (!y || !m) {
-        dateEl.textContent = '-';
+        dateEl.textContent = '—';
         valEl.textContent = 'нет данных';
         return;
       }
@@ -40,73 +44,134 @@
       valEl.textContent = (v !== undefined) ? v : 'нет данных';
     }
 
-    document.addEventListener('DOMContentLoaded', updatePreview);
+    document.addEventListener('DOMContentLoaded', () => {
+      syncMonthMax();
+      updatePreview();
+    });
   </script>
 
 </head>
 <body>
+<div class="theme-toggle">
+  <button id="toggle-theme">🌙</button>
+</div>
 
-  <div class="theme-toggle">
-    <button id="toggle-theme">🌙</button>
-  </div>
+<div class="edit-page">
+  <div class="bg-orbit bg-orbit-1"></div>
+  <div class="bg-orbit bg-orbit-2"></div>
 
-  <div class="form-card">
-    <h2>Изменение данных о пассажиропотоке поездов</h2>
+  <header class="edit-topbar">
+    <a href="{{ url_for('dashboard') }}" class="top-back">← Личный кабинет</a>
 
-    {% with messages = get_flashed_messages(with_categories=true, category_filter=['edit_success','edit_warning','edit_danger']) %}
-      {% if messages %}
-        <div class="flash-messages">
-          {% for category, message in messages %}
-            <div class="flash {{ category }}">{{ message }}</div>
-          {% endfor %}
-        </div>
-      {% endif %}
-    {% endwith %}
-
-    <div class="edit-grid">
-
-      <form method="POST" class="edit-form" autocomplete="off">
-        <label for="year">Год</label>
-        <input id="year" type="number" name="year" min="2016" max="2025" required
-               value="{{ request.form.get('year','') }}"
-               oninput="syncMonthMax();updatePreview();">
-
-        <label for="month">Месяц</label>
-        <input id="month" type="number" name="month" min="1" max="12" required
-               value="{{ request.form.get('month','') }}"
-               oninput="updatePreview();">
-
-        <label for="passengers">Новое количество пассажиров поездов</label>
-        <input id="passengers"
-               type="number"
-               name="passengers"
-               min="0"
-               max="1000"
-               required
-               value="{{ request.form.get('passengers','') }}">
-
-        <button type="submit">Изменить</button>
-      </form>
-
-      <aside class="preview">
-        <div class="preview-title">Текущее значение</div>
-        <div class="preview-line">
-          <span id="preview-date">—</span>
-          <span class="preview-sep">→</span>
-          <span id="preview-value" class="preview-value">нет данных</span>
-        </div>
-        <small class="muted">
-          Подсказка: изменяйте год/месяц — здесь появится текущее значение.
-        </small>
-      </aside>
-
+    <div class="top-brand">
+      <div class="brand-mark">TI</div>
+      <div class="brand-text">
+        <span class="brand-label">Traffic Insight</span>
+        <span class="brand-sub">Редактор данных</span>
+      </div>
     </div>
+  </header>
 
-    <a class="back-link" href="{{ url_for('dashboard') }}">← Назад</a>
-  </div>
+  <main class="edit-layout">
+    <section class="edit-main-card">
+      <div class="edit-header">
+        <p class="eyebrow">Администрирование • Данные • Контроль</p>
+        <h1>Изменение данных о пассажиропотоке</h1>
+        <p class="subtitle">
+          Укажите год и месяц (2016–{{ max_real_year }}), чтобы скорректировать количество пассажиров поездов.
+          Изменения применяются к фактическим данным, которые используются для статистики и прогноза.
+        </p>
+      </div>
 
-  <script>
-    const DATA_MAP = JSON.parse('{{ data_map|tojson|safe }}');
-  </script>
+      {% with messages = get_flashed_messages(with_categories=true, category_filter=['edit_success','edit_warning','edit_danger']) %}
+        {% if messages %}
+          <div class="flash-messages">
+            {% for category, message in messages %}
+              <div class="flash {{ category }}">{{ message }}</div>
+            {% endfor %}
+          </div>
+        {% endif %}
+      {% endwith %}
+
+      <div class="edit-grid">
+        <form method="POST" class="edit-form" autocomplete="off">
+          <div class="field">
+            <label for="year">Год</label>
+            <input id="year"
+                   type="number"
+                   name="year"
+                   min="2016"
+                   max="{{ max_real_year }}"
+                   required
+                   value="{{ request.form.get('year','') }}"
+                   oninput="syncMonthMax();updatePreview();">
+          </div>
+
+          <div class="field">
+            <label for="month">Месяц</label>
+            <input id="month"
+                   type="number"
+                   name="month"
+                   min="1"
+                   max="12"
+                   required
+                   value="{{ request.form.get('month','') }}"
+                   oninput="updatePreview();">
+          </div>
+
+          <div class="field">
+            <label for="passengers">Новое количество пассажиров поездов</label>
+            <input id="passengers"
+                   type="number"
+                   name="passengers"
+                   min="0"
+                   max="2000000000"
+                   required
+                   value="{{ request.form.get('passengers','') }}">
+          </div>
+
+          <button type="submit" class="btn-primary">Сохранить изменения</button>
+        </form>
+
+        <aside class="preview-card">
+          <div class="preview-header">
+            <span class="preview-title">Текущее значение</span>
+            <span class="preview-tag">Факт</span>
+          </div>
+          <div class="preview-line">
+            <span id="preview-date" class="preview-date">—</span>
+            <span class="preview-sep">→</span>
+            <span id="preview-value" class="preview-value">нет данных</span>
+          </div>
+          <p class="preview-hint">
+            Изменяйте год и месяц — здесь отображается значение в базе до обновления.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <aside class="edit-side-card">
+      <div class="side-glow"></div>
+      <h2>Зачем нужен редактор</h2>
+      <p class="side-desc">
+        Администратор может вручную скорректировать данные пассажиропотока,
+        если изменились исходные источники или были выявлены ошибки в учёте.
+      </p>
+
+      <div class="side-block">
+        <h3>Рекомендации</h3>
+        <ul>
+          <li>Используйте только подтверждённые значения.</li>
+          <li>Изменяйте данные в пределах фактического периода (до {{ max_real_year }} года).</li>
+          <li>После правки перепроверьте статистику и прогноз.</li>
+        </ul>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<script>
+  const DATA_MAP = JSON.parse('{{ data_map|tojson|safe }}');
+</script>
 </body>
 </html>

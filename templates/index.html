@@ -2,24 +2,152 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Главная</title>
+  <title>Прогноз пассажиропотока</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
   <script defer src="{{ url_for('static', filename='js/theme-toggle.js') }}"></script>
 </head>
 <body>
-  <!-- Кнопка переключения темы -->
+  <!-- Переключение темы -->
   <div class="theme-toggle">
     <button id="toggle-theme">🌙</button>
   </div>
 
-  <div class="welcome-container">
-    <h1>Прогнозирование пассажиропотока</h1>
-    <p>Анализ и прогнозирование загрузки пассажирских междугородних поездов</p>
+  <div class="page-shell">
+    <div class="gradient-orbit"></div>
 
-    <div class="action-buttons">
-      <a href="{{ url_for('login') }}" class="btn">Войти</a>
-      <a href="{{ url_for('register') }}" class="btn secondary">Регистрация</a>
-    </div>
+    <header class="topbar">
+      <div class="logo">
+        <span class="logo-mark">TI</span>
+        <span class="logo-text">Traffic Insight</span>
+      </div>
+      <div class="top-actions">
+        <!-- Вход только для админов -->
+        <a href="{{ url_for('login') }}" class="link-login">Войти</a>
+      </div>
+    </header>
+
+    <main class="hero">
+      <section class="hero-left">
+        <p class="eyebrow">Пассажирские перевозки • Аналитика • ИБ</p>
+        <h1>
+          Прогнозирование пассажиропотока
+          <span class="hero-highlight">на основе полученных данных</span>
+        </h1>
+        <p class="hero-subtitle">
+          Система позволяет смотреть статистику по годам и строить прогноз
+          пассажиропотока с учётом влияния инцидентов на железной дороге.
+        </p>
+
+        <div class="hero-actions">
+          <a href="{{ url_for('statistics') }}" class="btn btn-primary">
+            📊 Статистика
+          </a>
+          <a href="{{ url_for('predict') }}" class="btn btn-ghost">
+            📈 Сделать прогноз
+          </a>
+        </div>
+
+        <div class="hero-meta">
+          <div class="meta-item">
+            <span class="meta-label">Период данных</span>
+            <span class="meta-value">2016–2024</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Типы перевозок</span>
+            <span class="meta-value">Пригородные и дальние</span>
+          </div>
+          <div class="meta-item">
+            <span class="meta-label">Инциденты</span>
+            <span class="meta-value">Учёт влияния на потоки</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="hero-right">
+        <div class="card card-main">
+          <div class="card-header">
+            <span class="dot dot-green"></span>
+            <span class="dot dot-yellow"></span>
+            <span class="dot dot-red"></span>
+          </div>
+          <div class="card-body">
+            <div class="chart-row">
+              <div class="chart-col">
+                <p class="chart-title">Прогноз на год</p>
+                <p class="chart-value">+12,4%</p>
+                <p class="chart-caption">
+                  ожидаемый рост пассажиропотока при сохранении текущих трендов
+                </p>
+              </div>
+              <div class="chart-pills">
+                <span class="pill pill-green">Пригородное</span>
+                <span class="pill pill-blue">Дальнее</span>
+                <span class="pill pill-red">Инциденты</span>
+              </div>
+            </div>
+
+            <div class="mini-table">
+              <div class="mini-row mini-head">
+                <span>Месяц</span>
+                <span>Пассажиры</span>
+                <span>Статус</span>
+              </div>
+              <div class="mini-row">
+                <span>Март</span>
+                <span>184 200</span>
+                <span class="badge badge-ok">Норма</span>
+              </div>
+              <div class="mini-row">
+                <span>Апрель</span>
+                <span>192 850</span>
+                <span class="badge badge-alert">Инцидент</span>
+              </div>
+              <div class="mini-row">
+                <span>Май</span>
+                <span>201 430</span>
+                <span class="badge badge-ok">Норма</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card card-secondary">
+          <p class="card-secondary-title">Фокус на безопасности</p>
+          <p class="card-secondary-text">
+            Отдельный админ-доступ позволяет управлять данными и инцидентами,
+            не влияя на доступность статистики и прогноза для пользователей.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <section id="features" class="features">
+      <h2>Что вы получите</h2>
+      <div class="features-grid">
+        <div class="feature-item">
+          <h3>Живая статистика</h3>
+          <p>Подробные данные по месяцам, разделение на пригородное и дальнее следование.</p>
+        </div>
+        <div class="feature-item">
+          <h3>Прогнозирование</h3>
+          <p>Модели прогнозирования помогают планировать ресурсы и оценивать риски.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="how-it-works" class="how-it-works">
+      <p class="how-title">3 шага до аналитики</p>
+      <ol>
+        <li>Откройте раздел «Статистика» или «Прогноз» на главной странице.</li>
+        <li>Изучите динамику пассажиропотока и влияние инцидентов.</li>
+        <li>При необходимости войдите под админ-аккаунтом для редактирования данных.</li>
+      </ol>
+    </section>
+
+    <footer class="footer">
+      <span>© {{ current_year or 2025 }} Traffic Insight</span>
+      <span>Система анализа пассажиропотока железнодорожных перевозок</span>
+    </footer>
   </div>
 </body>
 </html>
